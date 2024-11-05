@@ -2,29 +2,34 @@
 
 A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
 
-## NOTES: 
+## NOTES:
+
 ### Code re-organization has occurred [2020-05-04]!
+
 Code was reorganized to make it work more easily on AWS's Elastic Beanstalk service.
 
 The changes over previous version were :
-1. Moved main code out of the APOD folder and into the top level directory as Elastic Beanstalk had a hard time finding the initial python file unless it was in the top-level folder. 
+
+1. Moved main code out of the APOD folder and into the top level directory as Elastic Beanstalk had a hard time finding the initial python file unless it was in the top-level folder.
 2. Changed service.py to application.py
 3. Changed references to app in application.py to application
 
 You can find a frozen version of the previous code in the branch called <a href="https://github.com/nasa/apod-api/tree/prevCodeOrganization">"prevCodeOrganization"</a>
 
 #### API Reliability
+
 A very large number of people use the instance of this API that NASA has set up. If you need a extremely reliable version of this API, you likely want to stand up your own version of the API. You can do that with this code! All information that this API returns is actually just grabbed from the <a href='https://apod.nasa.gov/apod/astropix.html'>Astronomy Photo of the Day Website</a> (APOD).
 
 #### Content Related Issues
+
 No one watching this repository has anything to do with Astronomy Photo of the Day website, so we're unable to deal with issues directly related to their content. Please contact them directly.
 
-
 # Table of contents
+
 1. [Getting Started](#getting_started)
-    1. [Standard environment](#standard_env)
-    2. [`virtualenv` environment](#virtualenv)
-    3. [`conda` environment](#conda)
+   1. [Standard environment](#standard_env)
+   2. [`virtualenv` environment](#virtualenv)
+   3. [`conda` environment](#conda)
 2. [Docs](#docs)
 3. [APOD parser](#TheAPODParser)
 4. [Deployed](#Deployed)
@@ -32,77 +37,111 @@ No one watching this repository has anything to do with Astronomy Photo of the D
 6. [Author](#author)
 
 &nbsp;
+
 ## Getting started <a name="getting_started"></a>
 
 ### Standard environment <a name="standard_env"></a>
 
 1. Clone the repo
+
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
+
 2. `cd` into the new directory
+
 ```bash
 cd apod-api
 ```
+
 3. Install dependencies into the project's `lib`
+
 ```bash
 pip install -r requirements.txt -t lib
 ```
+
 4. Add `lib` to your PYTHONPATH and run the server
+
 ```bash
 PYTHONPATH=./lib python application.py
 ```
+
 &nbsp;
+
 ### `virtualenv` environment <a name="virtualenv"></a>
 
 1. Clone the repo
+
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
+
 2. `cd` into the new directory
+
 ```bash
 cd apod-api
 ```
+
 3. Create a new virtual environment `env` in the directory
+
 ```bash
 python -m venv venv
 ```
+
 4. Activate the new environment
+
 ```bash
 .\venv\Scripts\Activate
 ```
+
 5. Install dependencies in new environment
+
 ```bash
 pip install -r requirements.txt
 ```
+
 6. Run the server locally
+
 ```bash
 python application.py
 ```
+
 &nbsp;
+
 ### `conda` environment <a name="conda"></a>
 
 1. Clone the repo
+
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
+
 2. `cd` into the new directory
+
 ```bash
 cd apod-api
 ```
+
 3. Create a new virtual environment `env` in the directory
+
 ```bash
 conda create --prefix ./env
 ```
+
 4. Activate the new environment
+
 ```bash
 conda activate ./env
 ```
+
 5. Install dependencies in new environment
+
 ```bash
 pip install -r requirements.txt
 ```
+
 6. Run the server locally
+
 ```bash
 python application.py
 ```
@@ -110,23 +149,31 @@ python application.py
 ### Run it in Docker
 
 1. Clone the repo
+
 ```bash
 git clone https://github.com/nasa/apod-api.git
 ```
+
 2. `cd` into the new directory
+
 ```bash
 cd apod-api
 ```
+
 3. Build the image
+
 ```bash
 docker build . -t apod-api
 ```
+
 4. Run the image
+
 ```bash
 docker run -p 5000:5000 apod-api
 ```
 
 &nbsp;
+
 ## Docs <a name="docs"></a>
 
 ### Endpoint: `/<version>/apod`
@@ -137,8 +184,8 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 #### URL Search Params | query string parameters
 
 - `api_key` | demo: `DEMO_KEY` | https://api.nasa.gov/#signUp
-- `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03).  Defaults to today's date.  Must be after 1995-06-16, the first day an APOD picture was posted.  There are no images for tomorrow available through this API.
-- `concept_tags` A boolean `True|False` indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
+- `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03). Defaults to today's date. Must be after 1995-06-16, the first day an APOD picture was posted. There are no images for tomorrow available through this API.
+- `concept_tags` A boolean `True|False` indicating whether concept tags should be returned with the rest of the response. The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text. (Better than just pure text search.) Defaults to False.
 - `hd` A boolean `True|False` parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes, it is always ignored by the service and high-resolution urls are returned regardless.
 - `count` A positive integer, no greater than 100. If this is specified then `count` randomly chosen images will be returned in a JSON array. Cannot be used in conjunction with `date` or `start_date` and `end_date`.
 - `start_date` A string in YYYY-MM-DD format indicating the start of a date range. All images in the range from `start_date` to `end_date` will be returned in a JSON array. Cannot be used with `date`.
@@ -148,15 +195,15 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 **Returned fields**
 
 - `resource` A dictionary describing the `image_set` or `planet` that the response illustrates, completely determined by the structured endpoint.
-- `concept_tags` A boolean reflection of the supplied option.  Included in response because of default values.
+- `concept_tags` A boolean reflection of the supplied option. Included in response because of default values.
 - `title` The title of the image.
 - `date` Date of image. Included in response because of default values.
 - `url` The URL of the APOD image or video of the day.
 - `hdurl` The URL for any high-resolution image for that day. Returned regardless of 'hd' param setting but will be omitted in the response IF it does not exist originally at APOD.
-- `media_type` The type of media (data) returned. May either be 'image' or 'video' depending on content.
+- `media_type` The type of media (data) returned. May either be 'image', 'video' or 'other' depending on content.
 - `explanation` The supplied text explanation of the image.
-- `concepts` The most relevant concepts within the text explanation.  Only supplied if `concept_tags` is set to True.
-- `thumbnail_url` The URL of thumbnail of the video. 
+- `concepts` The most relevant concepts within the text explanation. Only supplied if `concept_tags` is set to True.
+- `thumbnail_url` The URL of thumbnail of the video.
 - `copyright` The name of the copyright holder.
 - `service_version` The service version used.
 
@@ -165,6 +212,7 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 ```bash
 localhost:5000/v1/apod?api_key=DEMO_KEY&date=2014-10-01&concept_tags=True
 ```
+
 <details><summary>See Return Object</summary>
 <p>
 
@@ -204,14 +252,12 @@ localhost:5000/v1/apod?api_key=DEMO_KEY&date=2014-10-01&concept_tags=True
 </p>
 </details>
 
-
 ```bash
 https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
 ```
 
 <details><summary>See Return Object</summary>
 <p>
-
 
 ```jsoniq
 [
@@ -268,8 +314,6 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
 </p>
 </details>
 
-
-
 ```bash
 https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_date=2017-07-10
 ```
@@ -310,11 +354,11 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 ]
 ```
 
-
 </p>
 </details>
 
 #### Copyright
+
 If you are re-displaying imagery, you may want to check for the presence of the copyright. Anything without a copyright returned field is generally NASA and in the public domain. Please see the <a href=https://apod.nasa.gov/apod/lib/about_apod.html>"About image permissions"</a> section on the main Astronomy Photo of the Day site for more information.
 
 ## The APOD Parser<a name="TheAPODParser"></a>
@@ -347,9 +391,10 @@ response = apod_object_parser.get_data(<your_api_key>)
 
 -> `apod_object_parser.get_url(response)`
 
-**for full docs and more functions visit the readme of  the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
+**for full docs and more functions visit the readme of the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
 
 ## Deployed <a name="Deployed"></a>
+
 The deployed version of this API is based on the `eb` branch. The version that was deployed before that is in the `eb_previous` branch. The `master` branch is used as development as that's where most of the pull requests will come into anyways.
 
 This API is deployed on AWS using elastic beanstalk due to large number of people who use the service. However, if you're planning on using it just yourself, it is small enough to be stood up on a single micro EC2 or any other small size cloud compute machine.
@@ -360,14 +405,16 @@ Star this repo if you found it useful. Use the github issue tracker to give
 feedback on this repo.
 
 ## Author <a name="author"></a>
-- Brian Thomas (based on code by Dan Hammer) 
+
+- Brian Thomas (based on code by Dan Hammer)
 - Justin Gosses (made changes to allow this repository to run more easily on AWS Elastic Beanstalk after heroku instance was shut-down)
-- Please checkout the <a href="https://github.com/nasa/apod-api/graphs/contributors">contributers</a> to this repository on the righthand side of this page. 
+- Please checkout the <a href="https://github.com/nasa/apod-api/graphs/contributors">contributers</a> to this repository on the righthand side of this page.
 
 ## Contributing
-We do accept pull requests from the public. Please note that we can be slow to respond. Please be patient. 
 
-Also, **the people with rights on this repository are not people who can debug problems with the APOD website itself**. If you would like to contribute, right now we could use some attention to the tests. 
+We do accept pull requests from the public. Please note that we can be slow to respond. Please be patient.
+
+Also, **the people with rights on this repository are not people who can debug problems with the APOD website itself**. If you would like to contribute, right now we could use some attention to the tests.
 
 ## Links
 
